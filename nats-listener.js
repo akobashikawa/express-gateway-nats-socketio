@@ -7,16 +7,15 @@ module.exports = ({ nats, io }) => {
     const sc = nats.sc;
 
     nats.subscribe('frontend.>', async (subject, payload) => {
-        const message = payload.message;
-        console.log(`NATS client received message from frontend.test: ${message}`);
         try {
-            console.log(`HANDLER of frontend.test`);
+            console.log(`NATS client received payload from ${subject}: ${JSON.stringify(payload)}`);
+            console.log(`HANDLER of ${subject}`);
             if (io) {
                 io.emit(subject, payload);
-                console.log(`IO emit nats-message ${subject}: `, payload);
+                console.log(`IO emit received nats message ${subject}: `, payload);
             }
         } catch (error) {
-            console.error(`HANDLER of frontend.test error: `, error.message);
+            console.error(`HANDLER of ${subject} error: `, error.message);
         }
     });
 

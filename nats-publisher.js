@@ -26,15 +26,13 @@ async function initNats(app = null) {
 
 // Método para publicar sin esperar respuesta
 async function publish(subject, data) {
-    const responseSubject = `${subject}.response`;
-
     try {
         if (!nc) {
             await initNats();
         }
-        const payload = sc.encode(JSON.stringify(data));
-        nc.publish(subject, payload, { reply: responseSubject });
-        console.log(`NATS published message to ${subject}: ${JSON.stringify(data)}`);
+        const payload = sc.encode(data);
+        nc.publish(subject, payload);
+        console.log(`NATS published message to ${subject}`);
     } catch (error) {
         console.error(`NATS failed to publish message to ${subject}: ${error.message}`);
     }
@@ -48,13 +46,19 @@ async function subscribe(subject, handler) {
         }
     
         const subscription = nc.subscribe(subject, {
-            callback: async (err, msg, reply, subSubject, sid) => {
+            callback: async (err, msg) => {
                 if (err) {
                     console.error(`NATS error in subscription to ${subject}: ${err.message}`);
                     return;
                 }
-                const payload = JSON.parse(sc.decode(msg.data));
-                await handler(subSubject, payload);
+                let payload;
+                try {
+                    payload = JSON.parse(sc.decode(msg.data));
+                } catch (error) {
+                    payload = {text: sc.decode(msg.data)};
+                }
+                const msgSubject = msg.subject; 
+                await handler(msgSubject, payload);
             },
         });
     
