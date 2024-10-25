@@ -8,14 +8,30 @@ module.exports = ({ nats, io }) => {
 
     nats.subscribe('frontend.>', async (subject, payload) => {
         try {
-            console.log(`NATS client received payload from ${subject}: ${JSON.stringify(payload)}`);
-            console.log(`HANDLER of ${subject}`);
+            console.log(`NATS subscribe frontend.>, received payload from ${subject}: ${JSON.stringify(payload)}`);
+            console.log(`NATS subscribe frontend.>, HANDLER of ${subject}`);
             if (io) {
                 io.emit(subject, payload);
-                console.log(`IO emit received nats message ${subject}: `, payload);
+                console.log(`NATS subscribe frontend.>, IO emit received nats message ${subject}: `, payload);
             }
         } catch (error) {
-            console.error(`HANDLER of ${subject} error: `, error.message);
+            console.error(`NATS subscribe frontend.>, HANDLER of ${subject} error: `, error.message);
+        }
+    });
+
+    nats.subscribe('productos.request', async (subject, payload, msg) => {
+        try {
+            console.log(`NATS subscribe productos.request, received payload from ${subject}: ${JSON.stringify(payload)}`);
+            console.log(`NATS subscribe productos.request, HANDLER of ${subject}`);
+
+            // Respuesta simulada de productos
+            const productos = [{ id: 1, name: 'Producto A' }, { id: 2, name: 'Producto B' }];
+
+            // Publicamos la respuesta usando `msg.respond`
+            const result = sc.encode(JSON.stringify(productos));
+            msg.respond(result);
+        } catch (error) {
+            console.error(`NATS subscribe productos.request, HANDLER of ${subject} error: `, error.message);
         }
     });
 

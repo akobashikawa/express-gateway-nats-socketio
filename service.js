@@ -22,6 +22,16 @@ class Service {
         return message;
     }
 
+    async productos(req) {
+        const { method, params, query, body } = req;
+        const subject = 'productos.request';
+        console.log('service, productos', subject, { method, params, query, body });
+
+        // Espera la respuesta de NATS en JSON
+        const response = await this.nats.requestReply(subject, { method, params, query, body });
+        return response;
+    }
+
 }
 
 module.exports = Service;

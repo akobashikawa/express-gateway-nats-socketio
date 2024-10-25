@@ -24,21 +24,43 @@ async function initNats(app = null) {
     }
 }
 
-// Método para publicar sin esperar respuesta
+// Función para publicar sin esperar respuesta
 async function publish(subject, data) {
     try {
         if (!nc) {
             await initNats();
         }
-        const payload = sc.encode(data);
+        const payload = sc.encode(JSON.stringify(data));
         nc.publish(subject, payload);
-        console.log(`NATS published message to ${subject}`);
+        console.log(`NATS publish, published message to ${subject}`);
     } catch (error) {
-        console.error(`NATS failed to publish message to ${subject}: ${error.message}`);
+        console.error(`NATS publish, failed to publish message to ${subject}: ${error.message}`);
     }
 }
 
-// Método para suscribirse a un tema
+// Función para request-reply
+async function requestReply(subject, data) {
+    try {
+        if (!nc) {
+            await initNats();
+        }
+        const payload = sc.encode(JSON.stringify(data));
+        const timeout = 5000; // Tiempo máximo de espera en milisegundos
+
+        // Enviamos la solicitud y esperamos la respuesta
+        console.log(`NATS requestReply, received request from ${subject}:`, data, sc.decode(payload));
+        const message = await nc.request(subject, payload, { timeout });
+        const response = JSON.parse(sc.decode(message.data));
+
+        console.log(`NATS requestReply, received reply from ${subject}:`, response);
+        return response;
+    } catch (error) {
+        console.error(`NATS requestReply, failed request-reply to ${subject}: ${error.message}`);
+        return null;
+    }
+}
+
+// Función para suscribirse a un tema y escuchar mensajes
 async function subscribe(subject, handler) {
     try {
         if (!nc) {
@@ -48,7 +70,7 @@ async function subscribe(subject, handler) {
         const subscription = nc.subscribe(subject, {
             callback: async (err, msg) => {
                 if (err) {
-                    console.error(`NATS error in subscription to ${subject}: ${err.message}`);
+                    console.error(`NATS subscribe, error in subscription to ${subject}: ${err.message}`);
                     return;
                 }
                 let payload;
@@ -58,14 +80,14 @@ async function subscribe(subject, handler) {
                     payload = {text: sc.decode(msg.data)};
                 }
                 const msgSubject = msg.subject; 
-                await handler(msgSubject, payload);
+                await handler(msgSubject, payload, msg);
             },
         });
     
-        console.log(`NATS subscribed to ${subject}`);
+        console.log(`NATS subscribe, subscribed to ${subject}`);
         return subscription;
     } catch (error) {
-        console.error(`NATS failed to subscribe to ${subject}: ${error.message}`);
+        console.error(`NATS subscribe, failed to subscribe to ${subject}: ${error.message}`);
         return null;
     }
 }
@@ -76,4 +98,5 @@ module.exports = {
     nc,
     publish,
     subscribe,
+    requestReply,
 };

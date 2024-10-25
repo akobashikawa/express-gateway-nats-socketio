@@ -11,17 +11,17 @@ class Controller {
     }
 
     async productos(req, res) {
-        const productos = [];
+        const productos = await this.service.productos(req);
         res.json(productos);
     }
 
     async personas(req, res) {
-        const personas = [];
+        const personas = await this.service.personas();
         res.json(personas);
     }
 
     async ventas(req, res) {
-        const ventas = [];
+        const ventas = await this.service.ventas();
         res.json(ventas);
     }
 
