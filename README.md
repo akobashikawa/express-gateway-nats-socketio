@@ -1,4 +1,4 @@
-# Tienda Gateway
+# Express Gateway NATS SocketIO
 
 Modelo de gateway usando Express, SocketIO, NATS.
 

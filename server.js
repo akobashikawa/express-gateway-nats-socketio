@@ -3,6 +3,7 @@ const http = require('http');
 const { Server } = require('socket.io');
 const nats = require('./nats-publisher');
 
+const NAME = process.env.NAME || 'Gateway NATS SocketIO';
 const PORT = process.env.PORT || 3000;
 
 // Crear servidor HTTP para Socket.IO
@@ -37,6 +38,7 @@ io.on('connection', (socket) => {
 });
 
 server.listen(PORT, () => {
+    console.log(`${NAME}`);
     console.log(`HTTP server running on port: ${PORT}`);
 });
 
