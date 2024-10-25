@@ -23,7 +23,6 @@ class Service {
     }
 
     async requestReply({ subject, method, params, query, body }) {
-        console.log({ subject, method, params, query, body })
         // Espera la respuesta de NATS en JSON
         const response = await this.nats.requestReply(subject, { method, params, query, body });
         return response;
