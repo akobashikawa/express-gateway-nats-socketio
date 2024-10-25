@@ -11,7 +11,8 @@ class Controller {
     }
 
     async productos(req, res) {
-        const productos = await this.service.productos(req);
+        const { method, params, query, body } = req;
+        const productos = await this.service.productos({ method, params, query, body });
         res.json(productos);
     }
 

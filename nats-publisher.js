@@ -49,13 +49,60 @@ async function requestReply(subject, data) {
 
         // Enviamos la solicitud y esperamos la respuesta
         console.log(`NATS requestReply, received request from ${subject}:`, data, sc.decode(payload));
-        const message = await nc.request(subject, payload, { timeout });
-        const response = JSON.parse(sc.decode(message.data));
+        const msg = await nc.request(subject, payload, { timeout });
+        let response;
+        try {
+            response = JSON.parse(sc.decode(msg.data));
+        } catch (error) {
+            response = { text: sc.decode(msg.data) };
+        }
 
         console.log(`NATS requestReply, received reply from ${subject}:`, response);
         return response;
     } catch (error) {
         console.error(`NATS requestReply, failed request-reply to ${subject}: ${error.message}`);
+        return null;
+    }
+}
+
+// Método para manejar request-reply manualmente
+async function manualRequestReply(requestSubject, responseSubject, data) {
+    try {
+        if (!nc) {
+            await initNats();
+        }
+
+        // Publicar el mensaje en el tema de solicitud
+        const payload = sc.encode(JSON.stringify(data));
+        nc.publish(requestSubject, payload);
+        console.log(`NATS manualRequestReply, published request to ${requestSubject}:`, data);
+
+        // Devolver una promesa que se resuelve cuando se recibe la respuesta
+        return new Promise((resolve, reject) => {
+            // Manejar la respuesta en el tema de respuesta
+            const subscription = nc.subscribe(responseSubject, {
+                callback: async (err, msg) => {
+                    if (err) {
+                        console.error(`NATS manualRequestReply, error in subscription to ${responseSubject}: ${err.message}`);
+                        reject(err); // Rechazar la promesa si hay un error
+                        return;
+                    }
+                    let response;
+                    try {
+                        response = JSON.parse(sc.decode(msg.data));
+                    } catch (error) {
+                        response = { text: sc.decode(msg.data) };
+                    }
+                    
+                    console.log(`NATS manualRequestReply, received response from ${responseSubject}:`, response);
+                    resolve(response); // Resolver la promesa con la respuesta
+                },
+            });
+
+            console.log(`NATS manualRequestReply, subscribed to ${responseSubject}`);
+        });
+    } catch (error) {
+        console.error(`NATS manualRequestReply, failed to process request-reply: ${error.message}`);
         return null;
     }
 }
@@ -66,7 +113,7 @@ async function subscribe(subject, handler) {
         if (!nc) {
             await initNats();
         }
-    
+
         const subscription = nc.subscribe(subject, {
             callback: async (err, msg) => {
                 if (err) {
@@ -77,13 +124,13 @@ async function subscribe(subject, handler) {
                 try {
                     payload = JSON.parse(sc.decode(msg.data));
                 } catch (error) {
-                    payload = {text: sc.decode(msg.data)};
+                    payload = { text: sc.decode(msg.data) };
                 }
-                const msgSubject = msg.subject; 
+                const msgSubject = msg.subject;
                 await handler(msgSubject, payload, msg);
             },
         });
-    
+
         console.log(`NATS subscribe, subscribed to ${subject}`);
         return subscription;
     } catch (error) {
@@ -97,6 +144,7 @@ module.exports = {
     sc,
     nc,
     publish,
-    subscribe,
     requestReply,
+    manualRequestReply,
+    subscribe,
 };

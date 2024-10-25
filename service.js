@@ -22,13 +22,15 @@ class Service {
         return message;
     }
 
-    async productos(req) {
-        const { method, params, query, body } = req;
-        const subject = 'productos.request';
-        console.log('service, productos', subject, { method, params, query, body });
+    // async productos({ method, params, query, body }) {
+    //     // Espera la respuesta de NATS en JSON
+    //     const response = await this.nats.requestReply('productos.requestReply', { method, params, query, body });
+    //     return response;
+    // }
 
+    async productos({ method, params, query, body }) {
         // Espera la respuesta de NATS en JSON
-        const response = await this.nats.requestReply(subject, { method, params, query, body });
+        const response = await this.nats.manualRequestReply('productos.request', 'productos.response', { method, params, query, body });
         return response;
     }
 
