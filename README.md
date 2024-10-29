@@ -48,3 +48,29 @@ node repl.js
 # dentro, se pueden ejecutar los métodos del service
 await service.hello()
 ```
+
+## Con Docker y localhost
+
+```sh
+docker build -t tienda-gateway .
+
+docker run --network="host" \
+    -e PORT=3000 \
+    -e NATS_URL=nats://localhost:4222 \
+    --name tienda-gateway \
+    tienda-gateway
+
+# usando .env
+docker run --network="host" --env-file .env --name tienda-gateway tienda-gateway
+
+```
+
+### Con docker-compose
+
+- `Dockerfile` tiene una configuración para desarrollo standalone
+- `Dockerfile-mse` tiene una configuración para desarrollo como microservicio, para ser invocado desde la carpeta principal de mseTienda
+
+```sh
+docker-compose up --build
+docker-compose logs -f tienda-gateway
+```

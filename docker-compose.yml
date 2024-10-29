@@ -1,0 +1,30 @@
+services:
+      
+  tienda-gateway:
+    build:
+      context: . 
+      dockerfile: Dockerfile
+    ports:
+      - "8080:3000"
+    networks:
+      - tienda_network
+    volumes:
+      - .:/app
+    environment:
+      - NODE_ENV=development
+      - NAME=Gateway NATS SocketIO
+      - PORT=3000
+      - NATS_URL=nats://nats:4222
+    depends_on:
+      - nats
+      
+  nats:
+    image: nats:latest
+    ports:
+      - "4222:4222"
+    networks:
+      - tienda_network
+      
+networks:
+  tienda_network:
+    driver: bridge
