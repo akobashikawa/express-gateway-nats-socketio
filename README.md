@@ -1,6 +1,6 @@
-# Express Gateway NATS SocketIO
+# mseGateway Express
 
-Modelo de gateway usando Express, SocketIO, NATS.
+Gateway API para mseTienda, con ExpressJS, soporta NATS y SocketIO
 
 ## Run NATS server
 
