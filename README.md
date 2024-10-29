@@ -1,4 +1,4 @@
-# mseGateway Express
+# mseTienda Gateway Express
 
 Gateway API para mseTienda, con ExpressJS, soporta NATS y SocketIO
 
