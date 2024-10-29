@@ -2,18 +2,31 @@
 
 Gateway API para mseTienda, con ExpressJS, soporta NATS y SocketIO
 
-## Run NATS server
+## Install
+
+### NATS
 
 ```sh
-docker run -d --name nats-server -p 4222:4222
-
-nats server check connection -s nats://localhost:4222
+docker run -d --name nats-server -p 4222:4222 -p 8222:8222 nats -m 8222
 ```
 
-## Run gateway
+### Gateway
 
 ```sh
 npm install
+```
+
+## Run
+
+### NATS
+
+```sh
+docker start nats-server
+```
+
+### Gateway
+
+```sh
 npm run dev
 # HTTP server running on port: 3000
 # NATS connection to nats://localhost:4222: OK
@@ -21,15 +34,14 @@ npm run dev
 # NATS subscribed to frontend.test
 # NATS listeners initialized
 
+# test
 nats pub frontend.test '{"message": "Hello World!"}'
 # NATS client received message from frontend.test: Hello World!
 # HANDLER of frontend.test
 # IO emit nats-message frontend.test:  { message: 'Hello World!' }
 ```
 
-
-
-## Run repl
+### REPL
 
 ```sh
 node repl.js
