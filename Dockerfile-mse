@@ -6,6 +6,7 @@ WORKDIR /app
 
 # Copiar los archivos de dependencias
 COPY package*.json ./
+COPY .env-mse ./.env
 
 # Instalar las dependencias
 RUN npm install

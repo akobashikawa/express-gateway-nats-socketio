@@ -28,7 +28,7 @@ docker start nats-server
 
 ```sh
 npm run dev
-# HTTP server running on port: 3000
+# HTTP server running on port: 8080
 # NATS connection to nats://localhost:4222: OK
 # 
 # NATS subscribed to frontend.test
@@ -55,7 +55,7 @@ await service.hello()
 docker build -t tienda-gateway .
 
 docker run --network="host" \
-    -e PORT=3000 \
+    -e PORT=8080 \
     -e NATS_URL=nats://localhost:4222 \
     --name tienda-gateway \
     tienda-gateway

@@ -5,7 +5,7 @@ services:
       context: . 
       dockerfile: Dockerfile
     ports:
-      - "8080:3000"
+      - "8080:8080"
     networks:
       - tienda_network
     volumes:
@@ -13,7 +13,7 @@ services:
     environment:
       - NODE_ENV=development
       - NAME=Gateway NATS SocketIO
-      - PORT=3000
+      - PORT=8080
       - NATS_URL=nats://nats:4222
     depends_on:
       - nats
