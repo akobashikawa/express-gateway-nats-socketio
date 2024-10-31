@@ -72,7 +72,6 @@ docker run --network="host" --env-file .env --name tienda-gateway tienda-gateway
 - `Dockerfile-mse` tiene una configuración para desarrollo como microservicio, para ser invocado desde la carpeta principal de mseTienda
 
 ```sh
-docker network create --driver bridge tienda_network
 docker-compose up --build
 docker-compose logs -f tienda-gateway
 ```
