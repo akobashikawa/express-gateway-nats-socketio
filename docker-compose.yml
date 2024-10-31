@@ -15,16 +15,17 @@ services:
       - NAME=Gateway NATS SocketIO
       - PORT=8080
       - NATS_URL=nats://nats:4222
-    depends_on:
-      - nats
+    # depends_on:
+    #   - nats
       
-  nats:
-    image: nats:latest
-    ports:
-      - "4222:4222"
-    networks:
-      - tienda_network
+  # nats:
+  #   image: nats:latest
+  #   ports:
+  #     - "4222:4222"
+  #   networks:
+  #     - tienda_network
       
 networks:
   tienda_network:
-    driver: bridge
+    external: true  # Marcar red como externa
+    # driver: bridge
